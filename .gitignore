@@ -1,0 +1,6 @@
+aCoherentJourney/__pycache__/
+node_modules
+package-lock.json
+public/.sass-cache
+public/style.css.map
+uploads

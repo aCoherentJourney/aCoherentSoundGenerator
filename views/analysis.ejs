@@ -1,0 +1,53 @@
+<% include partials/header %>
+	
+
+	<section>
+		<div class="container">
+			<h3 class="display-4">File Analysis</h3>
+			<div class="alert alert-success" role="alert">
+				<%= msg %> <br>
+			</div>
+			
+			<ul>
+				<li>Filename: <%= filename %> <br></li>
+				<li>Encoding: <%= encoding %> <br></li>
+				<li>Mimetype: <%= mimetype %> <br></li>
+				<li>Path: <%= path %> <br></li>
+			</ul>
+
+			
+			<form class="form-inline mb-2">
+				<select class="custom-select mr-2" name="" id="">
+					<option value="freq">Spalte 1</option>
+					<option value="dur">Spalte 2</option>
+					<option value="dur">Spalte 3</option>
+					
+				</select>
+				<span> => Frequency</span>
+			</form>
+
+			<form class="form-inline mb-2">
+				<select class="custom-select mr-2" name="" id="">
+					<option value="freq">Spalte 1</option>
+					<option value="dur">Spalte 2</option>
+					<option value="dur">Spalte 3</option>
+					
+				</select>
+				<span> => Duration</span>
+			</form>
+
+			<form class="form-inline mb-2">
+				<select class="custom-select mr-2" name="" id="">
+					<option value="freq">Spalte 1</option>
+					<option value="dur">Spalte 2</option>
+					<option value="dur">Spalte 3</option>
+					
+				</select>
+				<span> => Something</span>
+			</form>
+			
+		</div>
+	</section>
+
+
+<% include partials/footer %>
