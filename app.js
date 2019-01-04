@@ -2,7 +2,12 @@
 const express     = require("express");
 const bodyParser  = require("body-parser");
 const path        = require("path");
-const multer      = require("multer")
+const multer      = require("multer");
+// const csv         = require("csv");
+const csv         = require("csvtojson")
+const fs          = require("fs");
+const lineReader  = require("readline");
+
 
 // const upload      = require("express-fileupload");
 
@@ -41,7 +46,7 @@ const upload = multer({
 // Check file type
 function checkFileType(file, cb){
   // Allowed extensions
-  const filetypes = /txt|csv|tab|png/;
+  const filetypes = /txt|csv|tab|png|json/;
   // Check extension
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   // Check mime type
@@ -58,24 +63,27 @@ function checkFileType(file, cb){
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
- // Call python script
-function analyzeFile(data){
-  const spawn = require('child_process').spawn;
-  const ls = spawn('python', ['./aCoherentJourney/test.py', data]);
+ 
 
-  ls.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
+function csvToJson(filepath){
 
-  ls.stderr.on('data', (data) => {
-    console.log(`stderr: ${data}`);
-  });
-
-  ls.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-  });
+  // Convert a csv file with csvtojson
+  let data = csv()
+    .fromFile(filepath)
+    .then(function(jsonArrayObj){ //when parse finished, result will be emitted here.
+      console.log(jsonArrayObj); 
+    });
 }
-  
+
+function csvSize(filepath){
+
+  let csv = csvToJson(filepath);
+  let csvSize = csv.length;
+
+  console.log(csvSize);
+  return csvSize;
+
+}
 
 
 
@@ -87,8 +95,6 @@ app.get("/", (req, res) => {
 });
 
 
-
-
 app.post("/upload", (req, res) => {
   upload(req, res, (err) => {
     if(err){
@@ -97,11 +103,10 @@ app.post("/upload", (req, res) => {
         msg: err
       });
     } else{
-
-      // console.log(req.file);
-
-      analyzeFile(req.file.path);
-
+      
+      // console.log(req.file.path);
+      csvToJson(req.file.path)
+      // csvSize(req.file.path)
 
       res.render("analysis", {
         msg: "File upload was successful",
@@ -111,7 +116,7 @@ app.post("/upload", (req, res) => {
         path: req.file.path   
       });
 
-     
+      
 
     }
   });
