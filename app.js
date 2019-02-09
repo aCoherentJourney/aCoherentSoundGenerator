@@ -63,27 +63,134 @@ function checkFileType(file, cb){
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+
  
-
+/**
+ * Convert .csv file to json format
+ */
 function csvToJson(filepath){
-
   // Convert a csv file with csvtojson
   let data = csv()
     .fromFile(filepath)
     .then(function(jsonArrayObj){ //when parse finished, result will be emitted here.
       console.log(jsonArrayObj); 
     });
+  return data;
 }
 
-function csvSize(filepath){
 
+/**
+ * Convert .csv file into an array
+ */
+function csvToArray(filepath){
+  const csv = filepath;
+  // Split rows
+  let rows = csv.split("\n");
+
+  return rows.map(function(row){
+    // Split columns
+    return row.split(",");
+  });
+}
+
+
+/**
+ * NEEDS COMMENT
+ */
+function csvSize(filepath){
   let csv = csvToJson(filepath);
   let csvSize = csv.length;
-
-  console.log(csvSize);
   return csvSize;
-
 }
+
+
+/**
+ * UPLOAD FILE
+ */
+// function uploadFile(req, res){
+
+//   let result = upload(req, res, (err) => {
+//     if(err){
+//       res.render("index", {
+//         msg: err
+//       });
+//     } else{
+             
+//       // Reads file
+//       let fileCont = fs.readFileSync(req.file.path, "utf8")
+
+//       // Convert file to json
+//       let jsonData = csvToJson(req.file.path);
+
+//       // Convert file into an array
+//       let arrayData = csvToArray(req.file.path);
+
+
+//       res.render("upload", {
+//         msg: "File upload was successful",
+//         filename: req.file.originalname,
+//         encoding:  req.file.encoding,
+//         mimetype: req.file.mimetype,
+//         path: req.file.path,
+//         data: jsonData
+//       });
+//     }
+//   });
+//   console.log(result)
+
+// }
+
+
+function uploadFile(req, res){
+  let fileCont;
+  let jsonData = new Promise( (resolve, reject) => {
+    resolve("done");
+
+    reject(new Error("OOOOps"))
+
+
+  });
+
+
+  upload(req, res, (err) => {
+      if(err){
+        res.render("index", {
+          msg: err
+        });
+      } else{
+               
+        // Reads file
+        fileCont = fs.readFileSync(req.file.path, "utf8")
+  
+        // Convert file to json
+        jsonData = csvToJson(req.file.path)
+        .then( data => {
+
+          data.forEach(item => {
+            console.log(item)
+          })
+
+        });
+  
+        // Convert file into an array
+        let arrayData = csvToArray(req.file.path);
+  
+  
+        res.render("upload", {
+          msg: "File upload was successful",
+          filename: req.file.originalname,
+          encoding:  req.file.encoding,
+          mimetype: req.file.mimetype,
+          path: req.file.path,
+          data: arrayData[0]
+        });
+      }
+
+
+    });
+}
+
+
 
 
 
@@ -95,32 +202,13 @@ app.get("/", (req, res) => {
 });
 
 
-app.post("/upload", (req, res) => {
-  upload(req, res, (err) => {
-    if(err){
-      // console.log(req.file);
-      res.render("index", {
-        msg: err
-      });
-    } else{
-      
-      // console.log(req.file.path);
-      csvToJson(req.file.path)
-      // csvSize(req.file.path)
+app.post("/upload", async (req, res) => {
+  let file = await uploadFile(req, res)
+}); // end of post upload
 
-      res.render("analysis", {
-        msg: "File upload was successful",
-        filename: req.file.originalname,
-        encoding:  req.file.encoding,
-        mimetype: req.file.mimetype,
-        path: req.file.path   
-      });
 
-      
 
-    }
-  });
-});
+
 
 
 // Start server
